@@ -1,0 +1,102 @@
+:root {
+  color-scheme: dark;
+  --bg: #050807;
+  --text: #f4fffb;
+  --muted: #8e9a97;
+  --accent: #5cffb1;
+  --card: rgba(18, 28, 24, 0.92);
+  font-family: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(120% 70% at 0% 0%, rgba(18, 72, 52, 0.45), transparent 55%), var(--bg);
+  color: var(--text);
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+}
+
+.brand {
+  margin: 0 0 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, #fff, var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 1.25rem;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 2rem;
+}
+
+h2 {
+  margin: 28px 0 12px;
+  font-size: 1.25rem;
+}
+
+p,
+li {
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.lead {
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0;
+  display: grid;
+  gap: 12px;
+}
+
+.links a,
+.nav a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.links a:hover,
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 16px;
+  padding: 20px 18px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+ul {
+  padding-left: 1.2rem;
+}
