@@ -3,14 +3,12 @@ import type { ParsedActions } from './types'
 const PHONE_RE =
   /(?:(?:\+|00)\d{1,3}[\s-]?)?(?:\(?\d{2,4}\)?[\s-]?)?\d{3}[\s-]?\d{2,4}[\s-]?\d{2,4}/g
 
-const URL_RE =
-  /(?:https?:\/\/|www\.)[^\s<>"'{}|\\^`\[\]]+/gi
+const URL_RE = /(?:https?:\/\/|www\.)[^\s<>"'{}|\\^`[\]]+/gi
 
 const ADDRESS_HINT_RE =
-  /\b(?:ул\.?|улица|пр\.?|проспект|пер\.?|переулок|б-р|бульвар|ш\.?|шоссе|д\.|дом|кв\.|ul\.?|street|st\.|ave\.|avenue|road|rd\.|blvd\.|lane|ln\.)\b/i
+  /(?:^|[^\p{L}\p{N}])(?:ул\.?|улица|пр\.?|проспект|пер\.?|переулок|б-р|бульвар|ш\.?|шоссе|д\.|дом|кв\.|ul\.?|street|st\.|ave\.|avenue|road|rd\.|blvd\.|lane|ln\.)(?=$|[^\p{L}])/iu
 
-const ADDRESS_LINE_RE =
-  /^.{0,120}?(?:\d{5,6}|[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}).{0,80}$/im
+const ADDRESS_LINE_RE = /^.{0,120}?(?:\d{5,6}|[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}).{0,80}$/im
 
 function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/[^\d+]/g, '')
@@ -49,9 +47,7 @@ function extractAddress(text: string): string | null {
   const postal = text.match(ADDRESS_LINE_RE)
   if (postal?.[0]) return postal[0].trim().slice(0, 160)
 
-  const joined = lines.find(
-    (l) => ADDRESS_HINT_RE.test(l) && l.split(/\s+/).length >= 3,
-  )
+  const joined = lines.find((l) => ADDRESS_HINT_RE.test(l) && l.split(/\s+/).length >= 3)
   return joined ? joined.slice(0, 160) : null
 }
 

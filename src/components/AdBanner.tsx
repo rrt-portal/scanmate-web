@@ -8,7 +8,12 @@ type Props = {
 
 export function AdBanner({ lang, placement }: Props) {
   return (
-    <div className="ad-banner" data-placement={placement} role="complementary" aria-label={t(lang, 'demoAd')}>
+    <div
+      className="ad-banner"
+      data-placement={placement}
+      role="complementary"
+      aria-label={t(lang, 'demoAd')}
+    >
       <span className="ad-label">{t(lang, 'demoAd')}</span>
       <span className="ad-body">{t(lang, 'demoAdBody')}</span>
       <style>{`

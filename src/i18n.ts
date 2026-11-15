@@ -10,13 +10,11 @@ const dict = {
     history: 'История',
     settings: 'Настройки',
     slide1Title: 'Сканируй скриншоты',
-    slide1Body:
-      'Выбери снимок экрана — ScanMate найдёт текст и сохранит удобный результат.',
+    slide1Body: 'Выбери снимок экрана — ScanMate найдёт текст и сохранит удобный результат.',
     slide2Title: 'История под рукой',
     slide2Body: 'Все сканы в одном месте. Вернись к любому результату за секунду.',
     slide3Title: 'Свой стиль',
-    slide3Body:
-      'Темы и язык — настрой приложение под себя. Pro открывает ещё больше.',
+    slide3Body: 'Темы и язык — настрой приложение под себя. Pro открывает ещё больше.',
     emptyTitle: 'Пока пусто',
     emptyBody: 'Выбери скриншот, чтобы начать сканирование текста.',
     chooseScreenshot: 'Выбрать скриншот',
@@ -112,8 +110,7 @@ const dict = {
     history: 'History',
     settings: 'Settings',
     slide1Title: 'Scan screenshots',
-    slide1Body:
-      'Pick a screenshot — ScanMate finds the text and saves a clean result.',
+    slide1Body: 'Pick a screenshot — ScanMate finds the text and saves a clean result.',
     slide2Title: 'History at hand',
     slide2Body: 'All scans in one place. Jump back to any result in a second.',
     slide3Title: 'Your style',

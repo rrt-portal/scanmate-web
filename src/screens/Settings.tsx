@@ -1,12 +1,6 @@
 import { FREE_SCAN_LIMIT } from '../billing'
 import { t } from '../i18n'
-import {
-  ALL_THEMES,
-  isThemeFree,
-  type AutoDeleteDays,
-  type Lang,
-  type ThemeId,
-} from '../storage'
+import { ALL_THEMES, isThemeFree, type AutoDeleteDays, type Lang, type ThemeId } from '../storage'
 import { themes } from '../theme'
 
 type Props = {
@@ -62,9 +56,7 @@ export function Settings({
         <header className="anim-fade-up" style={{ marginBottom: 18 }}>
           <h1 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 700 }}>{t(lang, 'settings')}</h1>
           <p className="muted" style={{ margin: '6px 0 0', fontSize: '0.9rem' }}>
-            {isPro
-              ? t(lang, 'unlimited')
-              : `${t(lang, 'scansLeft')}: ${left}/${FREE_SCAN_LIMIT}`}
+            {isPro ? t(lang, 'unlimited') : `${t(lang, 'scansLeft')}: ${left}/${FREE_SCAN_LIMIT}`}
             {isPro ? ' · Pro' : ''}
           </p>
         </header>

@@ -33,16 +33,10 @@ export function Result({ lang, draft, onBack, onShare, onToast }: Props) {
       </div>
 
       <div className="screen-scroll anim-fade-up">
-        {draft.imageDataUrl && (
-          <img className="result-thumb" src={draft.imageDataUrl} alt="" />
-        )}
+        {draft.imageDataUrl && <img className="result-thumb" src={draft.imageDataUrl} alt="" />}
 
         <div className="result-card">
-          <pre
-            className="result-text"
-            tabIndex={0}
-            onCopy={() => onToast(t(lang, 'copied'))}
-          >
+          <pre className="result-text" tabIndex={0} onCopy={() => onToast(t(lang, 'copied'))}>
             {preview}
           </pre>
           {draft.text.length > 280 && (

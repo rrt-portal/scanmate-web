@@ -30,7 +30,19 @@ export function History({ lang, historyEnabled, refreshKey, isPro }: Props) {
   }
 
   useEffect(() => {
-    void reload()
+    let cancelled = false
+    setLoading(true)
+    void listHistory()
+      .then((list) => {
+        if (!cancelled) setItems(historyEnabled ? list : [])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+    // refreshKey intentionally forces a reload after writes from other screens
   }, [historyEnabled, refreshKey])
 
   async function onDelete(id: string) {

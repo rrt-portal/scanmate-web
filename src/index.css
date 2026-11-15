@@ -57,8 +57,7 @@ button {
   padding: 0;
   background:
     radial-gradient(120% 80% at 10% -10%, rgba(40, 80, 60, 0.18), transparent 55%),
-    radial-gradient(90% 70% at 100% 100%, rgba(20, 40, 50, 0.2), transparent 50%),
-    #020303;
+    radial-gradient(90% 70% at 100% 100%, rgba(20, 40, 50, 0.2), transparent 50%), #020303;
 }
 
 .phone {
@@ -69,8 +68,7 @@ button {
   overflow: hidden;
   background:
     radial-gradient(120% 70% at 0% 0%, var(--bg-glow-a), transparent 55%),
-    radial-gradient(100% 70% at 100% 100%, var(--bg-glow-b), transparent 50%),
-    var(--bg);
+    radial-gradient(100% 70% at 100% 100%, var(--bg-glow-b), transparent 50%), var(--bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
@@ -121,7 +119,9 @@ button {
   font-weight: 700;
   font-size: 1.05rem;
   box-shadow: 0 12px 36px color-mix(in srgb, var(--accent) 35%, transparent);
-  transition: transform 160ms ease, filter 160ms ease;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
 }
 
 .primary-btn:active {
@@ -198,7 +198,9 @@ button {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
   z-index: 20;
 }
 
@@ -225,7 +227,9 @@ button {
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 500;
-  transition: background 160ms ease, color 160ms ease;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
 }
 
 .nav-item.active {

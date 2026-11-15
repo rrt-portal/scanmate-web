@@ -11,14 +11,7 @@ export const KEYS = {
 } as const
 
 export type Lang = 'ru' | 'en'
-export type ThemeId =
-  | 'midnight'
-  | 'ocean'
-  | 'ember'
-  | 'aurora'
-  | 'violet'
-  | 'rose'
-  | 'slate'
+export type ThemeId = 'midnight' | 'ocean' | 'ember' | 'aurora' | 'violet' | 'rose' | 'slate'
 export type AutoDeleteDays = 0 | 7 | 30 | 90
 
 export const FREE_THEMES: ThemeId[] = ['midnight', 'ocean', 'ember']
@@ -66,7 +59,9 @@ export function writeHistoryEnabled(enabled: boolean): void {
 }
 
 export function readAutoDeleteDays(): AutoDeleteDays {
-  const n = Number(localStorage.getItem(KEYS.autoDeleteDays))
+  const raw = localStorage.getItem(KEYS.autoDeleteDays)
+  if (raw === null) return 30
+  const n = Number(raw)
   if (n === 7 || n === 30 || n === 90 || n === 0) return n
   return 30
 }

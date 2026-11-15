@@ -34,9 +34,7 @@ export async function listHistory(): Promise<ScanItem[]> {
     const tx = db.transaction(STORE, 'readonly')
     const req = tx.objectStore(STORE).index('timestamp').getAll()
     req.onsuccess = () => {
-      const items = (req.result as ScanItem[])
-        .slice()
-        .sort((a, b) => b.timestamp - a.timestamp)
+      const items = (req.result as ScanItem[]).slice().sort((a, b) => b.timestamp - a.timestamp)
       resolve(items)
     }
     req.onerror = () => reject(req.error ?? new Error('list failed'))

@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  FREE_SCAN_LIMIT,
-  INTERSTITIAL_COOLDOWN_MS,
-  INTERSTITIAL_EVERY,
-} from './billing'
+import { FREE_SCAN_LIMIT } from './billing'
 import { ConsentDialog } from './components/ConsentDialog'
 import { InterstitialAd } from './components/InterstitialAd'
 import { PaywallDialog } from './components/PaywallDialog'
@@ -45,16 +41,10 @@ import {
   type ThemeId,
 } from './storage'
 import { applyTheme, themes } from './theme'
+import { canFreeScan, shouldShowInterstitial } from './viewmodel/monetization'
 
 type Route =
-  | 'consent'
-  | 'onboarding'
-  | 'main'
-  | 'paywall'
-  | 'result'
-  | 'privacy'
-  | 'terms'
-  | 'about'
+  'consent' | 'onboarding' | 'main' | 'paywall' | 'result' | 'privacy' | 'terms' | 'about'
 
 function newId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
@@ -171,16 +161,21 @@ export default function App() {
   }
 
   function maybeShowInterstitial(nextCount: number) {
-    if (isPro || readIsPro()) return
-    if (nextCount % INTERSTITIAL_EVERY !== 0) return
-    const last = readLastInterstitialAt()
-    if (Date.now() - last < INTERSTITIAL_COOLDOWN_MS) return
+    if (
+      !shouldShowInterstitial({
+        isPro: isPro || readIsPro(),
+        scanCount: nextCount,
+        lastInterstitialAt: readLastInterstitialAt(),
+      })
+    ) {
+      return
+    }
     writeLastInterstitialAt(Date.now())
     setShowInterstitial(true)
   }
 
   async function handleRecognized(next: ScanDraft) {
-    if (!isPro && scanCount >= FREE_SCAN_LIMIT) {
+    if (!canFreeScan(isPro, scanCount, FREE_SCAN_LIMIT)) {
       setShowLimitDialog(true)
       return
     }

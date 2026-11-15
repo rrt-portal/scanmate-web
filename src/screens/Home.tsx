@@ -106,7 +106,12 @@ export function Home({ lang, isPro, scanCount, onLimitReached, onRecognized }: P
             </div>
             <h2>{t(lang, 'emptyTitle')}</h2>
             <p>{t(lang, 'emptyBody')}</p>
-            <button type="button" className="primary-btn" onClick={openPicker} style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={openPicker}
+              style={{ marginTop: 8 }}
+            >
               {t(lang, 'chooseScreenshot')}
             </button>
           </div>
