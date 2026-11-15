@@ -37,20 +37,21 @@ CI runs the same gate on pushes/PRs to `main` (see `.github/workflows/ci.yml`).
 
 ## Publish / store listing
 
-| Resource                    | URL / path                                                     |
-| --------------------------- | -------------------------------------------------------------- |
-| Web preview (Cursor)        | https://scanmate.apps.grok.bot                                 |
-| Legal index (GitHub Pages)  | https://rrt-portal.github.io/scanmate-web/                     |
-| Privacy (EN)                | https://rrt-portal.github.io/scanmate-web/privacy.html         |
-| Terms (EN)                  | https://rrt-portal.github.io/scanmate-web/terms.html           |
-| Privacy (RU)                | https://rrt-portal.github.io/scanmate-web/privacy.ru.html      |
-| Terms (RU)                  | https://rrt-portal.github.io/scanmate-web/terms.ru.html        |
-| In-app / Vite static copies | `/legal/` from `public/legal/`                                 |
-| Store listing pointers      | [docs/store_listing/README.md](./docs/store_listing/README.md) |
-| Android listing pack        | Link when present: sibling `docs/store_listing/` (Android)     |
-| iOS listing pack            | Link when present: sibling `docs/store_listing/` (iOS)         |
+| Resource                           | URL / path                                                     |
+| ---------------------------------- | -------------------------------------------------------------- |
+| Web preview (Cursor)               | https://scanmate.apps.grok.bot                                 |
+| **Legal (live for Play)**          | https://scanmate.apps.grok.bot/legal/                          |
+| Privacy (EN, live)                 | https://scanmate.apps.grok.bot/legal/privacy.html              |
+| Terms (EN, live)                   | https://scanmate.apps.grok.bot/legal/terms.html                |
+| Privacy (RU, live)                 | https://scanmate.apps.grok.bot/legal/privacy.ru.html           |
+| Terms (RU, live)                   | https://scanmate.apps.grok.bot/legal/terms.ru.html             |
+| Legal (GitHub Pages, after enable) | https://rrt-portal.github.io/scanmate-web/                     |
+| Static sources                     | `public/legal/`                                                |
+| Store listing pointers             | [docs/store_listing/README.md](./docs/store_listing/README.md) |
+| Android listing pack               | When present: sibling `docs/store_listing/` (Android)          |
+| iOS listing pack                   | When present: sibling `docs/store_listing/` (iOS)              |
 
-Legal HTML is deployed by `.github/workflows/pages.yml` (GitHub Pages from `public/legal`). Use those URLs in Play Console / App Store Connect. Replace placeholder support emails before production.
+Legal HTML ships in `public/legal/` and is republished with the web preview for immediate store URLs. `.github/workflows/pages.yml` deploys the same folder to GitHub Pages once a repo admin sets **Pages → Source: GitHub Actions** (API enable returned 403 for this token). Replace placeholder support emails before production.
 
 Release notes: [docs/release-notes-1.0.0.md](./docs/release-notes-1.0.0.md).
 
