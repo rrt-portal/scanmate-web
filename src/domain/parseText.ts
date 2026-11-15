@@ -7,7 +7,7 @@ const URL_RE =
   /(?:https?:\/\/|www\.)[^\s<>"'{}|\\^`\[\]]+/gi
 
 const ADDRESS_HINT_RE =
-  /\b(?:ул\.?|улица|пр\.?|проспект|пер\.?|переулок|б-р|бульвар|ш\.?|шоссе|д\.|дом|кв\.|street|st\.|ave\.|avenue|road|rd\.|blvd\.|lane|ln\.)\b/i
+  /\b(?:ул\.?|улица|пр\.?|проспект|пер\.?|переулок|б-р|бульвар|ш\.?|шоссе|д\.|дом|кв\.|ul\.?|street|st\.|ave\.|avenue|road|rd\.|blvd\.|lane|ln\.)\b/i
 
 const ADDRESS_LINE_RE =
   /^.{0,120}?(?:\d{5,6}|[A-Z]{1,2}\d{1,2}\s?\d[A-Z]{2}).{0,80}$/im

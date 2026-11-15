@@ -151,6 +151,7 @@ export function Result({ lang, draft, onBack, onShare, onToast }: Props) {
           white-space: nowrap;
         }
         .action-cta {
+          grid-column: 2;
           grid-row: 1 / span 2;
           align-self: center;
           color: var(--accent);
