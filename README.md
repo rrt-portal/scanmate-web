@@ -7,15 +7,17 @@ Browser preview of ScanMate — dark mint OCR companion UI.
 - Vite + React + TypeScript
 - `tesseract.js` OCR (`eng+rus`)
 - IndexedDB history (max 50) + `localStorage` settings
+- Preview billing / demo ads (no Play Billing, no AdMob network)
 - Default language: Russian
 
-## Stage 2
+## Stage 3
 
-- Image picker (`accept=image/*`) → preview → OCR with progress / retry
-- `parseTextUseCase` extracts phone / URL / address
-- Result: selectable text, expand, smart links (`tel:` / `https:` / Maps), Web Share
-- History cards, detail sheet, delete / clear all, auto-delete days
-- System fonts only (no Google Fonts CDN)
+- Mock Pro at `$2.99` (Buy / Restore via `localStorage.isPro`)
+- Free scan limit 5 → paywall dialog; Pro unlimited
+- 3 free + 4 Pro themes (lock → paywall)
+- Demo banner ads on Home/History; interstitial every 3rd scan (2 min cap)
+- Consent dialog; Privacy / Terms / About pages
+- Clear “preview billing” messaging
 
 ## Run
 

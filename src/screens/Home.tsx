@@ -1,17 +1,22 @@
 import { useRef, useState } from 'react'
-import { t } from '../i18n'
-import type { Lang } from '../storage'
-import { IconDocPlus } from '../icons'
-import { recognizeImage } from '../ocr/recognize'
+import { FREE_SCAN_LIMIT } from '../billing'
+import { AdBanner } from '../components/AdBanner'
 import { parseTextUseCase } from '../domain/parseText'
 import type { ScanDraft } from '../domain/types'
+import { t } from '../i18n'
+import { IconDocPlus } from '../icons'
+import { recognizeImage } from '../ocr/recognize'
+import type { Lang } from '../storage'
 
 type Props = {
   lang: Lang
+  isPro: boolean
+  scanCount: number
+  onLimitReached: () => void
   onRecognized: (draft: ScanDraft) => void
 }
 
-export function Home({ lang, onRecognized }: Props) {
+export function Home({ lang, isPro, scanCount, onLimitReached, onRecognized }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [progress, setProgress] = useState<number | null>(null)
@@ -19,7 +24,13 @@ export function Home({ lang, onRecognized }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  const left = Math.max(0, FREE_SCAN_LIMIT - scanCount)
+
   function openPicker() {
+    if (!isPro && scanCount >= FREE_SCAN_LIMIT) {
+      onLimitReached()
+      return
+    }
     inputRef.current?.click()
   }
 
@@ -36,6 +47,10 @@ export function Home({ lang, onRecognized }: Props) {
 
   async function runOcr() {
     if (!previewUrl || busy) return
+    if (!isPro && scanCount >= FREE_SCAN_LIMIT) {
+      onLimitReached()
+      return
+    }
     setBusy(true)
     setError(null)
     setProgress(0)
@@ -65,8 +80,12 @@ export function Home({ lang, onRecognized }: Props) {
         </div>
         <div className="muted" style={{ marginTop: 4, fontSize: '0.95rem' }}>
           {t(lang, 'home')}
+          {' · '}
+          {isPro ? t(lang, 'unlimited') : `${t(lang, 'scansLeft')}: ${left}`}
         </div>
       </header>
+
+      {!isPro && <AdBanner lang={lang} placement="home" />}
 
       <input
         ref={inputRef}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AdBanner } from '../components/AdBanner'
 import { clearHistory, deleteHistoryItem, listHistory } from '../data/historyStore'
 import { mapsUrlForAddress, telHref } from '../domain/parseText'
 import type { ScanItem } from '../domain/types'
@@ -10,9 +11,10 @@ type Props = {
   lang: Lang
   historyEnabled: boolean
   refreshKey: number
+  isPro: boolean
 }
 
-export function History({ lang, historyEnabled, refreshKey }: Props) {
+export function History({ lang, historyEnabled, refreshKey, isPro }: Props) {
   const [items, setItems] = useState<ScanItem[]>([])
   const [selected, setSelected] = useState<ScanItem | null>(null)
   const [loading, setLoading] = useState(true)
@@ -84,6 +86,8 @@ export function History({ lang, historyEnabled, refreshKey }: Props) {
           </button>
         )}
       </header>
+
+      {!isPro && <AdBanner lang={lang} placement="history" />}
 
       {loading ? (
         <div className="empty muted">{t(lang, 'recognizing')}</div>

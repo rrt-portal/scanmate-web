@@ -1,24 +1,43 @@
 import { useEffect, useRef, useState } from 'react'
-import { pruneHistory, saveHistoryItem } from './data/historyStore'
+import {
+  FREE_SCAN_LIMIT,
+  INTERSTITIAL_COOLDOWN_MS,
+  INTERSTITIAL_EVERY,
+} from './billing'
+import { ConsentDialog } from './components/ConsentDialog'
+import { InterstitialAd } from './components/InterstitialAd'
+import { PaywallDialog } from './components/PaywallDialog'
 import { BottomNav, type TabId } from './components/BottomNav'
 import { Toast } from './components/Toast'
+import { pruneHistory, saveHistoryItem } from './data/historyStore'
 import type { ScanDraft, ScanItem } from './domain/types'
 import { t } from './i18n'
+import { privacyHtml, termsHtml } from './legal'
 import { History } from './screens/History'
 import { Home } from './screens/Home'
+import { LegalPage } from './screens/LegalPage'
 import { Onboarding } from './screens/Onboarding'
 import { Paywall } from './screens/Paywall'
 import { Result } from './screens/Result'
 import { Settings } from './screens/Settings'
 import {
+  incrementScanCount,
+  isThemeFree,
   readAutoDeleteDays,
+  readConsent,
   readHistoryEnabled,
+  readIsPro,
   readLang,
+  readLastInterstitialAt,
   readOnboarded,
+  readScanCount,
   readTheme,
   writeAutoDeleteDays,
+  writeConsent,
   writeHistoryEnabled,
+  writeIsPro,
   writeLang,
+  writeLastInterstitialAt,
   writeOnboarded,
   writeTheme,
   type AutoDeleteDays,
@@ -27,24 +46,48 @@ import {
 } from './storage'
 import { applyTheme, themes } from './theme'
 
-type Route = 'onboarding' | 'main' | 'paywall' | 'result'
+type Route =
+  | 'consent'
+  | 'onboarding'
+  | 'main'
+  | 'paywall'
+  | 'result'
+  | 'privacy'
+  | 'terms'
+  | 'about'
 
 function newId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
   return `scan_${Date.now()}_${Math.random().toString(16).slice(2)}`
 }
 
+function initialRoute(): Route {
+  if (!readConsent()) return 'consent'
+  if (!readOnboarded()) return 'onboarding'
+  return 'main'
+}
+
 export default function App() {
   const [lang, setLang] = useState<Lang>(() => readLang())
-  const [themeId, setThemeId] = useState<ThemeId>(() => readTheme())
+  const [themeId, setThemeId] = useState<ThemeId>(() => {
+    const saved = readTheme()
+    if (!isThemeFree(saved) && !readIsPro()) return 'midnight'
+    return saved
+  })
+  const [isPro, setIsPro] = useState(() => readIsPro())
+  const [scanCount, setScanCount] = useState(() => readScanCount())
   const [historyEnabled, setHistoryEnabled] = useState(() => readHistoryEnabled())
   const [autoDeleteDays, setAutoDeleteDays] = useState<AutoDeleteDays>(() => readAutoDeleteDays())
-  const [route, setRoute] = useState<Route>(() => (readOnboarded() ? 'main' : 'onboarding'))
+  const [route, setRoute] = useState<Route>(() => initialRoute())
   const [tab, setTab] = useState<TabId>('home')
   const [draft, setDraft] = useState<ScanDraft | null>(null)
   const [historyTick, setHistoryTick] = useState(0)
+  const [showLimitDialog, setShowLimitDialog] = useState(false)
+  const [showInterstitial, setShowInterstitial] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<number | null>(null)
+  const returnTab = useRef<TabId>('settings')
+  const legalReturn = useRef<Route>('main')
 
   useEffect(() => {
     applyTheme(themes[themeId])
@@ -73,6 +116,11 @@ export default function App() {
     toastTimer.current = window.setTimeout(() => setToast(null), 2200)
   }
 
+  function acceptConsent() {
+    writeConsent()
+    setRoute(readOnboarded() ? 'main' : 'onboarding')
+  }
+
   function finishOnboarding() {
     writeOnboarded()
     setRoute('main')
@@ -98,9 +146,52 @@ export default function App() {
     setAutoDeleteDays(days)
   }
 
+  function activatePro() {
+    writeIsPro(true)
+    setIsPro(true)
+    showToast(t(lang, 'proActivated'))
+  }
+
+  function buyPro() {
+    if (readIsPro()) {
+      showToast(t(lang, 'alreadyPro'))
+      return
+    }
+    activatePro()
+  }
+
+  function restorePurchases() {
+    if (readIsPro()) {
+      setIsPro(true)
+      showToast(t(lang, 'restoreOk'))
+      return
+    }
+    // Preview: restore only succeeds if already purchased locally
+    showToast(t(lang, 'restoreNone'))
+  }
+
+  function maybeShowInterstitial(nextCount: number) {
+    if (isPro || readIsPro()) return
+    if (nextCount % INTERSTITIAL_EVERY !== 0) return
+    const last = readLastInterstitialAt()
+    if (Date.now() - last < INTERSTITIAL_COOLDOWN_MS) return
+    writeLastInterstitialAt(Date.now())
+    setShowInterstitial(true)
+  }
+
   async function handleRecognized(next: ScanDraft) {
+    if (!isPro && scanCount >= FREE_SCAN_LIMIT) {
+      setShowLimitDialog(true)
+      return
+    }
+
+    const nextCount = isPro ? scanCount : incrementScanCount()
+    if (!isPro) setScanCount(nextCount)
+
     setDraft(next)
     setRoute('result')
+    maybeShowInterstitial(nextCount)
+
     if (!historyEnabled) {
       showToast(t(lang, 'historyDisabled'))
       return
@@ -137,28 +228,82 @@ export default function App() {
     }
   }
 
+  function openPaywall(from: TabId = 'settings') {
+    returnTab.current = from
+    setRoute('paywall')
+  }
+
+  const showChrome = route === 'main'
+
   return (
     <div className="app-shell">
       <div className="phone">
+        {route === 'consent' && (
+          <ConsentDialog
+            lang={lang}
+            onAccept={acceptConsent}
+            onPrivacy={() => {
+              legalReturn.current = 'consent'
+              setRoute('privacy')
+            }}
+            onTerms={() => {
+              legalReturn.current = 'consent'
+              setRoute('terms')
+            }}
+          />
+        )}
+
         {route === 'onboarding' && <Onboarding lang={lang} onDone={finishOnboarding} />}
 
-        {route === 'main' && (
+        {showChrome && (
           <>
-            {tab === 'home' && <Home lang={lang} onRecognized={handleRecognized} />}
+            {tab === 'home' && (
+              <Home
+                lang={lang}
+                isPro={isPro}
+                scanCount={scanCount}
+                onLimitReached={() => setShowLimitDialog(true)}
+                onRecognized={handleRecognized}
+              />
+            )}
             {tab === 'history' && (
-              <History lang={lang} historyEnabled={historyEnabled} refreshKey={historyTick} />
+              <History
+                lang={lang}
+                historyEnabled={historyEnabled}
+                refreshKey={historyTick}
+                isPro={isPro}
+              />
             )}
             {tab === 'settings' && (
               <Settings
                 lang={lang}
                 theme={themeId}
+                isPro={isPro}
+                scanCount={scanCount}
                 historyEnabled={historyEnabled}
                 autoDeleteDays={autoDeleteDays}
                 onLang={changeLang}
                 onTheme={changeTheme}
+                onLockedTheme={() => openPaywall('settings')}
                 onHistoryEnabled={changeHistoryEnabled}
                 onAutoDeleteDays={changeAutoDeleteDays}
-                onBuyPro={() => setRoute('paywall')}
+                onBuyPro={() => openPaywall('settings')}
+                onRestore={restorePurchases}
+                onPrivacy={() => {
+                  legalReturn.current = 'main'
+                  returnTab.current = 'settings'
+                  setRoute('privacy')
+                }}
+                onTerms={() => {
+                  legalReturn.current = 'main'
+                  returnTab.current = 'settings'
+                  setRoute('terms')
+                }}
+                onAbout={() => {
+                  legalReturn.current = 'main'
+                  returnTab.current = 'settings'
+                  setRoute('about')
+                }}
               />
             )}
             <BottomNav lang={lang} active={tab} onChange={setTab} />
@@ -178,13 +323,62 @@ export default function App() {
         {route === 'paywall' && (
           <Paywall
             lang={lang}
+            isPro={isPro}
+            onBack={() => {
+              setRoute('main')
+              setTab(returnTab.current)
+            }}
+            onBuy={buyPro}
+            onRestore={restorePurchases}
+          />
+        )}
+
+        {route === 'privacy' && (
+          <LegalPage
+            lang={lang}
+            title={t(lang, 'privacy')}
+            html={privacyHtml(lang)}
+            onBack={() => {
+              setRoute(legalReturn.current)
+              if (legalReturn.current === 'main') setTab(returnTab.current)
+            }}
+          />
+        )}
+
+        {route === 'terms' && (
+          <LegalPage
+            lang={lang}
+            title={t(lang, 'terms')}
+            html={termsHtml(lang)}
+            onBack={() => {
+              setRoute(legalReturn.current)
+              if (legalReturn.current === 'main') setTab(returnTab.current)
+            }}
+          />
+        )}
+
+        {route === 'about' && (
+          <LegalPage
+            lang={lang}
+            title={t(lang, 'about')}
+            html={`<h2>ScanMate</h2><p>${t(lang, 'aboutBody')}</p><p>${t(lang, 'version')}</p><p>${t(lang, 'previewBilling')}</p>`}
             onBack={() => {
               setRoute('main')
               setTab('settings')
             }}
-            onBuy={() => showToast(t(lang, 'buySoon'))}
-            onRestore={() => showToast(t(lang, 'restoreSoon'))}
           />
+        )}
+
+        {showLimitDialog && (
+          <PaywallDialog
+            lang={lang}
+            onClose={() => setShowLimitDialog(false)}
+            onOpenPaywall={() => openPaywall('home')}
+          />
+        )}
+
+        {showInterstitial && (
+          <InterstitialAd lang={lang} onClose={() => setShowInterstitial(false)} />
         )}
 
         <Toast message={toast} />

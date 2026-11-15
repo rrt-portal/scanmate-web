@@ -1,15 +1,22 @@
+import { PRODUCT_PRICE } from '../billing'
 import { t } from '../i18n'
 import type { Lang } from '../storage'
 
 type Props = {
   lang: Lang
+  isPro: boolean
   onBack: () => void
   onBuy: () => void
   onRestore: () => void
 }
 
-export function Paywall({ lang, onBack, onBuy, onRestore }: Props) {
-  const features = [t(lang, 'featureThemes'), t(lang, 'featureHistory'), t(lang, 'featureOcr')]
+export function Paywall({ lang, isPro, onBack, onBuy, onRestore }: Props) {
+  const features = [
+    t(lang, 'featureThemes'),
+    t(lang, 'featureHistory'),
+    t(lang, 'featureOcr'),
+    t(lang, 'featurePriority'),
+  ]
 
   return (
     <div className="screen paywall">
@@ -23,6 +30,7 @@ export function Paywall({ lang, onBack, onBuy, onRestore }: Props) {
         </div>
         <h1>{t(lang, 'proTitle')}</h1>
         <p className="muted">{t(lang, 'proSubtitle')}</p>
+        <p className="preview-note">{t(lang, 'previewBilling')}</p>
 
         <ul>
           {features.map((item) => (
@@ -35,10 +43,19 @@ export function Paywall({ lang, onBack, onBuy, onRestore }: Props) {
       </div>
 
       <div className="pay-footer anim-fade-up-delay">
-        <div className="price">{t(lang, 'price')}</div>
-        <button type="button" className="primary-btn" onClick={onBuy}>
-          {t(lang, 'buy')}
-        </button>
+        {isPro ? (
+          <div className="pro-active">{t(lang, 'proActivated')}</div>
+        ) : (
+          <>
+            <div className="price">
+              {PRODUCT_PRICE}
+              <span className="muted"> · preview</span>
+            </div>
+            <button type="button" className="primary-btn" onClick={onBuy}>
+              {t(lang, 'buy')}
+            </button>
+          </>
+        )}
         <button type="button" className="ghost-btn restore" onClick={onRestore}>
           {t(lang, 'restore')}
         </button>
@@ -55,13 +72,20 @@ export function Paywall({ lang, onBack, onBuy, onRestore }: Props) {
           font-weight: 800;
           letter-spacing: 0.02em;
         }
-        .pay-main p { margin: 0; line-height: 1.45; max-width: 34ch; }
+        .pay-main p { margin: 0; line-height: 1.45; max-width: 36ch; }
+        .preview-note {
+          font-size: 0.85rem !important;
+          padding: 10px 12px;
+          border-radius: 12px;
+          background: var(--surface);
+          color: var(--text-muted) !important;
+        }
         .pay-main ul {
           list-style: none;
-          margin: 28px 0 0;
+          margin: 20px 0 0;
           padding: 0;
           display: grid;
-          gap: 16px;
+          gap: 14px;
         }
         .pay-main li {
           display: flex;
@@ -81,6 +105,15 @@ export function Paywall({ lang, onBack, onBuy, onRestore }: Props) {
         .pay-footer { display: grid; gap: 12px; justify-items: center; }
         .price { font-size: 1.2rem; font-weight: 700; }
         .restore { color: var(--text-muted); }
+        .pro-active {
+          width: 100%;
+          text-align: center;
+          padding: 14px;
+          border-radius: 16px;
+          background: var(--accent-soft);
+          color: var(--accent);
+          font-weight: 800;
+        }
       `}</style>
     </div>
   )
