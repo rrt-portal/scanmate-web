@@ -1,11 +1,15 @@
 import { t } from '../i18n'
-import type { Lang, ThemeId } from '../storage'
+import type { AutoDeleteDays, Lang, ThemeId } from '../storage'
 
 type Props = {
   lang: Lang
   theme: ThemeId
+  historyEnabled: boolean
+  autoDeleteDays: AutoDeleteDays
   onLang: (lang: Lang) => void
   onTheme: (theme: ThemeId) => void
+  onHistoryEnabled: (enabled: boolean) => void
+  onAutoDeleteDays: (days: AutoDeleteDays) => void
   onBuyPro: () => void
 }
 
@@ -15,7 +19,25 @@ const themeMeta: { id: ThemeId; swatch: string }[] = [
   { id: 'ember', swatch: 'linear-gradient(135deg, #140e08, #FFB05C)' },
 ]
 
-export function Settings({ lang, theme, onLang, onTheme, onBuyPro }: Props) {
+const deleteOptions: { value: AutoDeleteDays; key: 'daysNever' | 'days7' | 'days30' | 'days90' }[] =
+  [
+    { value: 0, key: 'daysNever' },
+    { value: 7, key: 'days7' },
+    { value: 30, key: 'days30' },
+    { value: 90, key: 'days90' },
+  ]
+
+export function Settings({
+  lang,
+  theme,
+  historyEnabled,
+  autoDeleteDays,
+  onLang,
+  onTheme,
+  onHistoryEnabled,
+  onAutoDeleteDays,
+  onBuyPro,
+}: Props) {
   return (
     <div className="screen">
       <div className="screen-scroll">
@@ -61,6 +83,36 @@ export function Settings({ lang, theme, onLang, onTheme, onBuyPro }: Props) {
           </div>
         </section>
 
+        <section className="anim-fade-up-delay" style={{ marginTop: 26 }}>
+          <p className="section-title">{t(lang, 'historySection')}</p>
+          <button
+            type="button"
+            className={`toggle-row${historyEnabled ? ' on' : ''}`}
+            onClick={() => onHistoryEnabled(!historyEnabled)}
+            aria-pressed={historyEnabled}
+          >
+            <span>{t(lang, 'historyEnabled')}</span>
+            <span className="toggle-pill" aria-hidden />
+          </button>
+
+          <p className="section-title" style={{ marginTop: 16 }}>
+            {t(lang, 'autoDelete')}
+          </p>
+          <div className="days-grid">
+            {deleteOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={autoDeleteDays === opt.value ? 'selected' : ''}
+                onClick={() => onAutoDeleteDays(opt.value)}
+                disabled={!historyEnabled}
+              >
+                {t(lang, opt.key)}
+              </button>
+            ))}
+          </div>
+        </section>
+
         <button type="button" className="pro-row anim-fade-up-delay" onClick={onBuyPro}>
           <span className="pro-badge">PRO</span>
           <span className="pro-label">{t(lang, 'buyPro')}</span>
@@ -84,9 +136,7 @@ export function Settings({ lang, theme, onLang, onTheme, onBuyPro }: Props) {
           border: 1px solid transparent;
           font-weight: 500;
         }
-        .theme-row.selected {
-          border-color: var(--accent);
-        }
+        .theme-row.selected { border-color: var(--accent); }
         .swatch {
           width: 28px;
           height: 28px;
@@ -111,6 +161,57 @@ export function Settings({ lang, theme, onLang, onTheme, onBuyPro }: Props) {
           background: var(--accent);
           color: var(--on-accent);
         }
+        .toggle-row {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 14px 16px;
+          border-radius: 16px;
+          background: var(--surface);
+          font-weight: 600;
+        }
+        .toggle-pill {
+          width: 46px;
+          height: 28px;
+          border-radius: 999px;
+          background: color-mix(in srgb, var(--text-muted) 35%, transparent);
+          position: relative;
+          transition: background 160ms ease;
+        }
+        .toggle-pill::after {
+          content: '';
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: #fff;
+          transition: transform 160ms ease;
+        }
+        .toggle-row.on .toggle-pill { background: var(--accent); }
+        .toggle-row.on .toggle-pill::after { transform: translateX(18px); }
+        .days-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-top: 10px;
+        }
+        .days-grid button {
+          padding: 12px 10px;
+          border-radius: 14px;
+          background: var(--surface);
+          font-weight: 600;
+          color: var(--text-muted);
+          border: 1px solid transparent;
+        }
+        .days-grid button.selected {
+          border-color: var(--accent);
+          color: var(--text);
+        }
+        .days-grid button:disabled { opacity: 0.45; }
         .pro-row {
           margin-top: 28px;
           width: 100%;

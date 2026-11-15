@@ -1,20 +1,21 @@
 # ScanMate Web
 
-Stage 1 browser preview of ScanMate — dark mint OCR companion UI.
+Browser preview of ScanMate — dark mint OCR companion UI.
 
 ## Stack
 
 - Vite + React + TypeScript
-- `localStorage` for onboarding, language, and theme
+- `tesseract.js` OCR (`eng+rus`)
+- IndexedDB history (max 50) + `localStorage` settings
 - Default language: Russian
 
-## Screens
+## Stage 2
 
-- Onboarding (3 slides + Skip/Start)
-- Home empty state + screenshot picker stub (toast)
-- History empty state
-- Settings: Midnight / Ocean / Ember themes, ru/en, Buy Pro
-- Paywall stub (Buy / Restore → toast)
+- Image picker (`accept=image/*`) → preview → OCR with progress / retry
+- `parseTextUseCase` extracts phone / URL / address
+- Result: selectable text, expand, smart links (`tel:` / `https:` / Maps), Web Share
+- History cards, detail sheet, delete / clear all, auto-delete days
+- System fonts only (no Google Fonts CDN)
 
 ## Run
 

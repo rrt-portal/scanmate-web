@@ -13,8 +13,8 @@
   --on-accent: #06120c;
   --nav-active-bg: rgba(28, 68, 50, 0.75);
   --toast-bg: rgba(14, 22, 19, 0.94);
-  --font-brand: 'Syne', 'Outfit', sans-serif;
-  --font-body: 'Outfit', sans-serif;
+  --font-brand: 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-body: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
   --radius-lg: 18px;
   --radius-xl: 24px;
   --shell-max: 430px;
